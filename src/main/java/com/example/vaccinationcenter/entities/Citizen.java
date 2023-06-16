@@ -70,7 +70,7 @@ public class Citizen {
     }
 
     public String getVaccinationStatus() {
-        return getDoesCount() == 2 ? "FULLY_VACCINATED": doesCount+"";
+        return getDoesCount() == 2 ? "FULLY_VACCINATED": "NOT_VACCINATED";
     }
 
     public void setVaccinationStatus(String vaccinationStatus) {

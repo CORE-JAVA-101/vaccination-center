@@ -1,9 +1,11 @@
 package com.example.vaccinationcenter.controllers;
 
+import com.example.vaccinationcenter.dtos.CitizenDto;
 import com.example.vaccinationcenter.entities.Citizen;
 import com.example.vaccinationcenter.entities.VaccinationCenter;
 import com.example.vaccinationcenter.repository.CitizenRepository;
 import com.example.vaccinationcenter.services.VaccinationCenterService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping("citizens")
+@RequestMapping(value = "citizens", produces = "application/json")
 public class CitizenController {
 
   @Autowired
@@ -42,29 +44,30 @@ public class CitizenController {
   }
 
   @PostMapping
-  public Citizen addCitizen(@RequestBody Citizen citizen)
-  {
+  public Citizen addCitizen(@Valid @RequestBody CitizenDto citizenDto) {
+    Citizen citizen = new Citizen();
+    citizen.setName(citizenDto.getName());
+    citizen.setCity(citizenDto.getCity());
     return citizenRepository.save(citizen);
   }
 
   @PutMapping
-  public Citizen updateCitizen(@PathVariable long id, @RequestBody Citizen citizen)
-  {
-    long centerId =citizen.getCenter().getId();
+  public Citizen updateCitizen(@PathVariable long id, @Valid @RequestBody CitizenDto citizenDto) {
+    long centerId = citizenDto.getCenterId();
     VaccinationCenter vaccinationCenter = vaccinationCenterService.getVaccinationCenter(centerId);
+    Citizen citizen = findCitizen(citizenDto.getId());
     citizen.setCenter(vaccinationCenter);
     return citizenRepository.save(citizen);
   }
 
   @DeleteMapping("/{id}")
-  public Boolean deleteCitizen(@PathVariable long id)
-  {
+  public Boolean deleteCitizen(@PathVariable long id) {
     citizenRepository.deleteById(id);
     return true;
   }
 
   @GetMapping("/center/{centerId}")
-  public List<Citizen> findByCenterId(@PathVariable long centerId){
+  public List<Citizen> findByCenterId(@PathVariable long centerId) {
     return citizenRepository.findAllByCenterId(centerId);
   }
 }

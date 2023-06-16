@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class VaccinationCenter {
 
   private String name;
   private String address;
-  @OneToMany( mappedBy = "center",cascade = CascadeType.ALL)
+  @OneToMany( mappedBy = "center",cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<Citizen> citizenList;
 
   public Long getId() {
@@ -44,4 +43,5 @@ public class VaccinationCenter {
   public void setAddress(String address) {
     this.address = address;
   }
+
 }
