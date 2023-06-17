@@ -32,6 +32,12 @@ public class ViewController {
     return "citizen_center";
   }
 
+  @GetMapping("vaccinationcenter/{id}")
+  public String vaccinationcenterByCenterId(@PathVariable int id, Model model) {
+    model.addAttribute("id",id);
+    return "citizen_center";
+  }
+
   @GetMapping("vaccinationcenter")
   public String vaccinationCenterPage() {
     return "vaccination_center";

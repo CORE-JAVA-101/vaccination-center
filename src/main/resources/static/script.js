@@ -18,6 +18,7 @@ function getBaseUrl() {
 
 function getHeaders() {
   return {
+    "Content-Type": "application/json",
     Accept: "application/json",
   };
 }
@@ -35,10 +36,61 @@ function citizenList() {
   citizenListByUrl(url, _citizenDelete);
 }
 
-function citizenListByUrl(url, deleteAction) {
-  var tableBody = document
-    .getElementById("citizensTable")
-    .querySelector("tbody");
+function citizenListByUrl(url, deleteAction, tableId) {
+  let tableRow = {
+    citizensTable: function (citizen) {
+      return `<td>${citizen.id}</td>
+        <td>${citizen.name}</td>
+        <td>${citizen.city}</td>
+        <td>${citizen.doesCount}</td>
+        <td>${citizen.vaccinationStatus}</td>
+        <td>${citizen.center?.name}</td>
+        <td> 
+        <button id="${citizen.id}" onclick="_citizenView(event)">View</button>
+        <button id="${citizen.id}" onclick="_citizenEdit(event)">Edit</button>
+        <button id="${citizen.id}" onclick="${deleteAction.name}(event)">Delete</button>
+        </td>`;
+    },
+
+    centerCitizensTable: function (citizen) {
+      return `<td>${citizen.id}</td>
+      <td>${citizen.name}</td>
+      <td> 
+      <button id="${citizen.id}" onclick="_citizenView(event)">View</button>
+      </td>`;
+    },
+  };
+
+  let listTableId = "citizensTable";
+  if (tableId) {
+    let centerId = document.getElementById("centerId").value;
+    fetch(getBaseUrl() + "/vaccinationcenter/" + centerId, {
+      headers: getHeaders(),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        throw new Error("Error while fetching center by id: " + centerId);
+      })
+      .then((center) => {
+        let centerDetails = ` <ul class="list-group">
+  <li class="list-group-item">ID: ${center.id}</li>
+  <li class="list-group-item">Name: ${center.name}</li>
+  <li class="list-group-item">City: ${center.address}</li>
+      </ul>`;
+
+        let centerElement = document.getElementById("oneCenter");
+        centerElement.innerHTML = "";
+        centerElement.innerHTML = centerDetails;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    listTableId = tableId;
+  }
+  var tableBody = document.getElementById(listTableId).querySelector("tbody");
   tableBody.innerHTML = "";
 
   // Fetch citizen data from API
@@ -58,11 +110,13 @@ function citizenListByUrl(url, deleteAction) {
     .then(function (citizens) {
       // Populate the table with citizen data
       var tableBody = document
-        .getElementById("citizensTable")
+        .getElementById(listTableId)
         .querySelector("tbody");
       citizens.forEach(function (citizen) {
         var row = document.createElement("tr");
-        row.innerHTML = `
+        row.innerHTML = tableRow[listTableId](citizen);
+
+        let test = `
                     <td>${citizen.id}</td>
                     <td>${citizen.name}</td>
                     <td>${citizen.city}</td>
@@ -154,14 +208,31 @@ function _layoutCitizenOnEdit(citizen) {
     });
 }
 
-function _layoutEditForm(citizen, centers) {
-  document.getElementById("citizenId").value = citizen.id;
-  document.getElementById("citizenName").value = citizen.name;
-  document.getElementById("citizenCity").value = citizen.city;
-  document.getElementById("vaccinationCount").value = citizen.doesCount;
-  document.getElementById("vaccinationStatus").innerHTML =
-    citizen.vaccinationStatus;
+function _layoutCitizenOnNew() {
+  let baseUrl = document.getElementById("baseUrl");
+  console.log(baseUrl.value);
+  fetch(baseUrl.value + "/vaccinationcenter", {
+    method: "GET",
+    headers: getHeaders(),
+  })
+    .then(function (response) {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Error deleting citizen data.");
+      }
+    })
+    .then(function (centers) {
+      console.log(centers);
+      console.log("design form");
+      _layoutAppendCenters(centers);
+    })
+    .catch(function (error) {
+      console.error("Error:", error);
+    });
+}
 
+function _layoutAppendCenters(centers, citizen) {
   let center = document.getElementById("center");
 
   let centerOptions = centers;
@@ -175,7 +246,18 @@ function _layoutEditForm(citizen, centers) {
 
   // Select a default option
   let defaultOption = citizen.center?.id; // Set the value of the default option here
-  center.value = defaultOption;
+  if (defaultOption) {
+    center.value = defaultOption;
+  }
+}
+function _layoutEditForm(citizen, centers) {
+  document.getElementById("citizenId").value = citizen.id;
+  document.getElementById("citizenName").value = citizen.name;
+  document.getElementById("citizenCity").value = citizen.city;
+  document.getElementById("vaccinationCount").value = citizen.doesCount;
+  document.getElementById("vaccinationStatus").innerHTML =
+    citizen.vaccinationStatus;
+  _layoutAppendCenters(centers, citizen);
 }
 
 function _layoutOneCitizenView(citizen) {
@@ -219,6 +301,7 @@ function _citizenEdit(event) {
   display("citizenView", "none");
   display("citizenDetails", "none");
   display("citizenEdit", "block");
+  display("citizenOnEdit", "block");
 
   let id = event.target.id;
   citizenApi.edit(id, _layoutCitizenOnEdit);
@@ -264,21 +347,18 @@ function centerFormAdd(event) {
     httpMethod: "POST",
   };
 
-  let methodName = 'POST';
-  let centerId = document.getElementById('centerId').value;
-  if(centerId){
-    methodName = 'PUT';
-    payload.httpMethod = 'PUT'
+  let methodName = "POST";
+  let centerId = document.getElementById("centerId").value;
+  if (centerId) {
+    methodName = "PUT";
+    payload.httpMethod = "PUT";
     payload.id = centerId;
   }
 
   // Make a POST request to the vaccinationcenter endpoint
   fetch(getBaseUrl() + "/vaccinationcenter", {
     method: methodName,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: getHeaders(),
     body: JSON.stringify(payload),
   })
     .then((response) => {
@@ -292,12 +372,11 @@ function centerFormAdd(event) {
             // Display error messages as warnings
             let errorLabels = "";
             data.errors.forEach((error) => {
-              errorLabels += `<label>${error.message}</label><br/>`;
+              errorLabels += `<div class="alert alert-warning" role="alert">${error.message}</div>`;
             });
 
             let errorListElement = document.getElementById("errorList");
             errorListElement.innerHTML = errorLabels;
-            errorListElement.classList.add("alert", "alert-warning");
 
             document.getElementById("centerForm").appendChild(errorListElement);
           } else {
@@ -313,7 +392,7 @@ function centerFormAdd(event) {
     .then((data) => {
       console.log("Response:", data);
       // Handle the response as needed
-      vaccinationCenters();
+      window.location.href = getBaseUrl() + "/vaccinationcenter";
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -364,9 +443,14 @@ function vaccinationCenters() {
     });
 }
 
-function _centerView(event) {}
+function _centerView(event) {
+  let id = event.target.id;
+  window.location.href = getBaseUrl() + "/vaccinationcenter/" + id;
+}
 
 function _centerEdit(event) {
+  display("centers", "none");
+  display("centerForm", "block");
   let id = event.target.id;
   fetch(getBaseUrl() + "/vaccinationcenter/" + id, {
     headers: getHeaders(),
@@ -398,7 +482,7 @@ function bindDataWithEditForm(center) {
     var value = option.value;
     var text = option.text;
 
-    if(city === text){
+    if (city === text) {
       selectedCityValue = value;
       break;
     }
@@ -407,11 +491,11 @@ function bindDataWithEditForm(center) {
     console.log("Option text: " + text);
   }
 
-  if(selectedCityValue){
+  if (selectedCityValue) {
     select.value = selectedCityValue;
   }
-  document.getElementById('centerName').value = center.name;
-  document.getElementById('centerId').value = center.id;
+  document.getElementById("centerName").value = center.name;
+  document.getElementById("centerId").value = center.id;
 }
 function _centerDelete(event) {
   let id = event.target.id;
@@ -433,4 +517,107 @@ function _centerDelete(event) {
     .catch((error) => {
       console.log(error);
     });
+}
+
+function saveCitizen(event) {
+  event.preventDefault(); // Prevent form submission
+
+  let errorListElement = document.getElementById("errorList");
+  errorListElement.innerHTML = "";
+  errorListElement.className = "";
+  // Get form data
+  const citizenId = document.getElementById("citizenId").value;
+  const citizenName = document.getElementById("citizenName").value;
+  const citizenCity = document.getElementById("citizenCity").value;
+
+  const vaccinationCountSelect = document.getElementById("vaccinationCount");
+  const vaccinationCountSelectValue =
+    vaccinationCountSelect.options[vaccinationCountSelect.selectedIndex].value;
+
+  const vaccinationCenterSelect = document.getElementById("center");
+  const centerId = vaccinationCenterSelect.value;
+
+  // Create payload object
+  let methodName = "POST";
+
+  const payload = {
+    name: citizenName,
+    city: citizenCity,
+    doesCount: 0,
+    httpMethod: methodName,
+    centerId: centerId,
+    doesCount: vaccinationCountSelectValue,
+  };
+
+  if (citizenId) {
+    methodName = "PUT";
+    payload.httpMethod = "PUT";
+    payload.id = citizenId;
+  }
+
+  // Make a POST request to the vaccinationcenter endpoint
+  fetch(getBaseUrl() + "/citizens", {
+    method: methodName,
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (response.ok) {
+        // Successful response, handle it accordingly
+        return response.json();
+      } else if (response.status === 400) {
+        // Bad Request, handle errors
+        return response.json().then((data) => {
+          if (Array.isArray(data.errors)) {
+            // Display error messages as warnings
+
+            let errorLabels = "";
+            data.errors.forEach((error) => {
+              errorLabels += `<div class="alert alert-warning" role="alert">${error.message}</div>`;
+            });
+
+            let errorListElement = document.getElementById("errorList");
+            errorListElement.innerHTML = errorLabels;
+
+            // document.getElementById("centerForm").appendChild(errorListElement);
+          } else {
+            console.warn("Warning: Bad Request");
+          }
+          throw new Error("Bad Request");
+        });
+      } else {
+        // Handle other response status codes
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+    })
+    .then((data) => {
+      console.log("Response:", data);
+      let messageElement = document.getElementById('errorList');
+      messageElement.innerHTML = `
+      <div class="alert alert-success" role="alert">
+  Citizen Saved
+</div>
+      `;
+      setTimeout(()=>{
+        let messageElement = document.getElementById('errorList');
+        messageElement.innerHTML='';
+      },2000);
+      // Handle the response as needed
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      // Handle errors
+    });
+}
+
+function _newCenter(event) {
+  display("centers", "none");
+  display("centerForm", "block");
+}
+
+function _newCitizen(event) {
+  display("citizenDetails", "none");
+  display("citizenEdit", "block");
+  display("citizenOnEdit", "none");
+  _layoutCitizenOnNew();
 }

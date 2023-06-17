@@ -11,11 +11,10 @@
     <div class="container">
 
         <%@ include file="header.jsp" %>
-            <input type="hidden" id="centerId" value="${id}">
             <div id="citizenEdit">
-                <h2>Edit Citizen</h2>
+                <h2>Citizen Form</h2>
 
-                <form id="citizenEditForm" onsubmit="citizenEditForm(event)">
+                <form id="citizenEditForm">
                     <input type="hidden" id="citizenId">
                     <div class="form-group">
                         <label for="name">Name:</label>
@@ -27,19 +26,26 @@
                     </div>
                     <div class="form-group">
                         <label for="count">Vaccination Count:</label>
-                        <input type="text" class="form-control" id="vaccinationCount" required>
+                        <select class="form-control" id="vaccinationCount" required>
+                            <option value="0">None</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="status">Status:</label>
                         <label class="form-control" id="vaccinationStatus" required>
                     </div>
                     <div class="form-group">
-                        <label for="gender">Vaccination Centers:</label>
+                        <label for="center">Vaccination Centers:</label>
                         <select class="form-control" id="center" required>
                             <option value="">Select Center</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" onclick="saveCitizen(event)" class="btn btn-primary">Submit</button>
+
+                    <br>
+                    <span id="errorList"></span>
 
                 </form>
             </div>
@@ -49,16 +55,18 @@
             </div>
 
             <div id="citizenDetails">
+            <button type="button" onclick="_newCitizen(event)" class="btn btn-primary">Add New Citizen</button>
+
+                <h1>Center Details</h1>
+                <div id="oneCenter">
+                </div>
+                <input type="hidden" id="centerId" value="${id}">
                 <h2>Citizen Details</h2>
-                <table id="citizensTable" class="table">
+                <table id="centerCitizensTable" class="table">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>City</th>
-                            <th>Dose Count</th>
-                            <th>Vaccination Status</th>
-                            <th>Vaccination Center</th>
                             <th>Action</th>
 
                         </tr>
@@ -78,18 +86,16 @@
         display("citizenEdit", "none");
         let id = document.getElementById("centerId").value;
         console.log(id);
-        citizenListByUrl(getBaseUrl() + "/citizens/center/" + id, deleteCallback);
+        citizenListByUrl(getBaseUrl() + "/citizens/center/" + id, deleteCallback,'centerCitizensTable');
     }
 
-    function deleteCallback(event)
-    {
-      citizenApi.delete(event.target.id,redirectCallback);
+    function deleteCallback(event) {
+        citizenApi.delete(event.target.id, redirectCallback);
     }
 
-    function redirectCallback()
-    {
+    function redirectCallback() {
         let id = document.getElementById("centerId").value;
-        window.location.href = getBaseUrl() + "/citizens/center/"+value
+        window.location.href = getBaseUrl() + "/citizens/center/" + value
     }
 </script>
 

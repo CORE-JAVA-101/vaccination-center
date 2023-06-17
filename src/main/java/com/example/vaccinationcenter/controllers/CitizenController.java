@@ -46,17 +46,24 @@ public class CitizenController {
   @PostMapping
   public Citizen addCitizen(@Valid @RequestBody CitizenDto citizenDto) {
     Citizen citizen = new Citizen();
+    VaccinationCenter vaccinationCenter = vaccinationCenterService.getVaccinationCenter(citizenDto.getCenterId());
+
     citizen.setName(citizenDto.getName());
     citizen.setCity(citizenDto.getCity());
+    citizen.setCenter(vaccinationCenter);
+
     return citizenRepository.save(citizen);
   }
 
   @PutMapping
-  public Citizen updateCitizen(@PathVariable long id, @Valid @RequestBody CitizenDto citizenDto) {
+  public Citizen updateCitizen( @Valid @RequestBody CitizenDto citizenDto) {
     long centerId = citizenDto.getCenterId();
     VaccinationCenter vaccinationCenter = vaccinationCenterService.getVaccinationCenter(centerId);
     Citizen citizen = findCitizen(citizenDto.getId());
     citizen.setCenter(vaccinationCenter);
+    citizen.setName(citizenDto.getName());
+    citizen.setCity(citizenDto.getCity());
+    citizen.setDoesCount(citizenDto.getDoesCount());
     return citizenRepository.save(citizen);
   }
 

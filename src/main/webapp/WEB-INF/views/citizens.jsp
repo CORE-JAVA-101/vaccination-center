@@ -12,41 +12,64 @@
 
         <%@ include file="header.jsp" %>
             <div id="citizenEdit">
-                <h2>Edit Citizen</h2>
+                <h2>Citizen From</h2>
 
-                <form id="citizenEditForm" onsubmit="citizenEditForm(event)">
+
+                <form id="citizenEditForm">
                     <input type="hidden" id="citizenId">
                     <div class="form-group">
                         <label for="name">Name:</label>
                         <input type="text" class="form-control" id="citizenName" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="city">City:</label>
-                        <input type="text" class="form-control" id="citizenCity" required>
+                        <label for="citizenCity">Citizen City:</label>
+                        <select class="form-control" id="citizenCity" required>
+                          <option value="City 1">City 1</option>
+                          <option value="City 2">City 2</option>
+                          <option value="City 3">City 3</option>
+                          <!-- Add more city options as needed -->
+                        </select>
+        
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="center">Vaccination Centers:</label>
+                        <select class="form-control" id="center" required>
+                        </select>
+                    </div>
+
+                    <div id="citizenOnEdit">
+                        
                     <div class="form-group">
                         <label for="count">Vaccination Count:</label>
-                        <input type="text" class="form-control" id="vaccinationCount" required>
+                        <select class="form-control" id="vaccinationCount" required>
+                            <option value="0">None</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="status">Status:</label>
                         <label class="form-control" id="vaccinationStatus" required>
                     </div>
-                    <div class="form-group">
-                        <label for="gender">Vaccination Centers:</label>
-                        <select class="form-control" id="center" required>
-                            <option value="">Select Center</option>
-                        </select>
+                   
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    
+                    <button type="submit" onclick="saveCitizen(event)" class="btn btn-primary">Submit</button>
+
+                    <br>
+                    <span id="errorList"></span>
+
                 </form>
+
             </div>
             <div id="citizenView">
                 <h2> View Citizen</h2>
                 <div id="oneCitizen"></div>
             </div>
             <div id="citizenDetails">
+                <button type="button" onclick="_newCitizen(event)" class="btn btn-primary">Add New Citizen</button>
+
                 <h2>Citizen Details</h2>
                 <table id="citizensTable" class="table">
                     <thead>
@@ -54,7 +77,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>City</th>
-                            <th>Dose Count</th>
+                            <th>Vaccination Count</th>
                             <th>Vaccination Status</th>
                             <th>Vaccination Center</th>
                             <th>Action</th>

@@ -89,7 +89,7 @@ public class CitizenDtoValidator implements ConstraintValidator<CitizenValidator
       boolean flag = super.validate(citizen, context);
 
 
-      if (citizen.getDoesCount() > 2 && citizen.getDoesCount() < 0) {
+      if (citizen.getDoesCount() > 2 || citizen.getDoesCount() < 0) {
         flag = false;
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate("Citizen vaccine count should between 0 or 1 or 2").addPropertyNode("doesCount")
@@ -97,7 +97,7 @@ public class CitizenDtoValidator implements ConstraintValidator<CitizenValidator
 
       }
 
-      if (citizen.getCenterId() > 0) {
+      if (citizen.getCenterId() < 1) {
         flag = false;
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate("vaccine centerId should be greater than 0")
@@ -106,7 +106,7 @@ public class CitizenDtoValidator implements ConstraintValidator<CitizenValidator
 
       }
 
-      if (citizen.getId() < 0) {
+      if (citizen.getId() < 1) {
         flag = false;
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate("citizen Id should be greater than 0")
