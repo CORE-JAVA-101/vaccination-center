@@ -1,12 +1,5 @@
-<%
-String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-%>
-<%= baseUrl %>
 
-<br>
-<script src="<%= baseUrl %>/script.js"></script>
-
-<input type="hidden" id="baseUrl" value="<%= baseUrl %>"/>
+<%@ include file="base.jsp" %>
 <style>
     /* Custom styles for the dark navbar */
     .navbar-dark {
@@ -25,12 +18,35 @@ String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + r
             <a class="nav-link" href="<%= baseUrl %>/vaccinationcenter">Vaccination Centers</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Logout</a>
+            <a class="nav-link" href="#" onclick="logout()">Logout</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Welcome, Admin</a>
+            <a class="nav-link" href="#">Welcome, <span id="userName"></span></a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
+
+  <script>
+    function loadUserInfo()
+    {
+        fetch(getBaseUrl()+"/me",{
+            headers: getHeaders()
+        })
+        .then(response=>{
+            if(response.ok)
+            {
+                return response.json();
+            }
+            throw new Error('error while accessing user info');
+        })
+        .then(data=>{
+            document.getElementById('userName').innerText= data.name;
+        })
+        .catch(error=>{
+            console.log(error);
+        })
+    }
+    setTimeout(loadUserInfo, 1000);
+  </script>

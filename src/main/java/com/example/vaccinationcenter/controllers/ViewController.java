@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 public class ViewController {
 
-  @GetMapping("login")
-  public String loginPage() {
-    return "login";
-  }
 
   @GetMapping("citizens")
   public String citizensPage() {
@@ -21,20 +17,20 @@ public class ViewController {
 
   @GetMapping("citizens/{id}")
   public String citizensPage(@PathVariable int id, Model model) {
-    model.addAttribute("id",id);
+    model.addAttribute("id", id);
     return "view_citizen";
   }
 
 
   @GetMapping("citizens/center/{id}")
   public String citizensPageByCenterId(@PathVariable int id, Model model) {
-    model.addAttribute("id",id);
+    model.addAttribute("id", id);
     return "citizen_center";
   }
 
   @GetMapping("vaccinationcenter/{id}")
   public String vaccinationcenterByCenterId(@PathVariable int id, Model model) {
-    model.addAttribute("id",id);
+    model.addAttribute("id", id);
     return "citizen_center";
   }
 
@@ -42,4 +38,17 @@ public class ViewController {
   public String vaccinationCenterPage() {
     return "vaccination_center";
   }
+
+  @GetMapping(value = {"/","/login"})
+  public String loginPage() {
+    return "login";
+  }
+
+  @GetMapping("/register")
+  public String registrationPage() {
+    return "register";
+  }
+
+
+
 }

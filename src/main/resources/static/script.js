@@ -16,11 +16,30 @@ function getBaseUrl() {
   return baseUrl.value;
 }
 
+function logout()
+{
+  localStorage.removeItem("token");
+  window.location.href=getBaseUrl() + "/login";
+}
+function redirectToLogin(response)
+{
+  if(response.status == 302){
+  logout();
+  }
+}
 function getHeaders() {
-  return {
+  console.log(localStorage.getItem("token"));
+  let headers =  {
     "Content-Type": "application/json",
     Accept: "application/json",
+    "x-api":true
   };
+  let authToken = localStorage.getItem("token");
+  if(authToken)
+  {
+   headers.authorization = authToken; 
+  }
+  return headers;
 }
 
 function citizenList() {
@@ -68,9 +87,11 @@ function citizenListByUrl(url, deleteAction, tableId) {
       headers: getHeaders(),
     })
       .then((response) => {
+        redirectToLogin(response);
         if (response.ok) {
           return response.json();
         }
+
 
         throw new Error("Error while fetching center by id: " + centerId);
       })
@@ -101,6 +122,9 @@ function citizenListByUrl(url, deleteAction, tableId) {
     headers: getHeaders(),
   })
     .then(function (response) {
+      
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -144,6 +168,8 @@ function bindCitizenWithCallback(id, callback) {
     headers: getHeaders(),
   })
     .then(function (response) {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -167,6 +193,8 @@ function deleteCitizen(id, callback) {
     headers: getHeaders(),
   })
     .then(function (response) {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -191,6 +219,8 @@ function _layoutCitizenOnEdit(citizen) {
     headers: getHeaders(),
   })
     .then(function (response) {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -216,6 +246,8 @@ function _layoutCitizenOnNew() {
     headers: getHeaders(),
   })
     .then(function (response) {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -362,6 +394,8 @@ function centerFormAdd(event) {
     body: JSON.stringify(payload),
   })
     .then((response) => {
+      redirectToLogin(response);
+
       if (response.ok) {
         // Successful response, handle it accordingly
         return response.json();
@@ -412,6 +446,8 @@ function vaccinationCenters() {
     headers: getHeaders(),
   })
     .then(function (response) {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -456,6 +492,8 @@ function _centerEdit(event) {
     headers: getHeaders(),
   })
     .then((response) => {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       }
@@ -505,6 +543,8 @@ function _centerDelete(event) {
     headers: getHeaders(),
   })
     .then((response) => {
+      redirectToLogin(response);
+
       if (response.ok) {
         return response.json();
       } else {
@@ -562,6 +602,8 @@ function saveCitizen(event) {
     body: JSON.stringify(payload),
   })
     .then((response) => {
+      redirectToLogin(response);
+
       if (response.ok) {
         // Successful response, handle it accordingly
         return response.json();
