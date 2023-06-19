@@ -38,7 +38,7 @@ public class LoginRequestDtoValidator implements ConstraintValidator<LoginReques
     }
 
 
-    if(!(value.getPassword().length() > 6 && value.getEmail().length() < 10))
+    if(!(value.getPassword().length() > 6 && value.getPassword().length() < 10))
     {
       flag = false;
       context.disableDefaultConstraintViolation();

@@ -29,8 +29,8 @@
       })
       .then(response =>{
         if(response.ok){  
-        response.json();
         onActionMessage(`<div class="alert alert-success" role="alert">Registration Success.</div>`)
+        return response.json();
         }
         console.log(response);
         throw new Error('Error While registration: ');
