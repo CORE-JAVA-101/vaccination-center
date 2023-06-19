@@ -16,28 +16,25 @@ function getBaseUrl() {
   return baseUrl.value;
 }
 
-function logout()
-{
+function logout() {
   localStorage.removeItem("token");
-  window.location.href=getBaseUrl() + "/login";
+  window.location.href = getBaseUrl() + "/login";
 }
-function redirectToLogin(response)
-{
-  if(response.status == 302){
-  logout();
+function redirectToLogin(response) {
+  if (response.status == 302) {
+    logout();
   }
 }
 function getHeaders() {
   console.log(localStorage.getItem("token"));
-  let headers =  {
+  let headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "x-api":true
+    "x-api": true,
   };
   let authToken = localStorage.getItem("token");
-  if(authToken)
-  {
-   headers.authorization = authToken; 
+  if (authToken) {
+    headers.authorization = authToken;
   }
   return headers;
 }
@@ -92,7 +89,6 @@ function citizenListByUrl(url, deleteAction, tableId) {
           return response.json();
         }
 
-
         throw new Error("Error while fetching center by id: " + centerId);
       })
       .then((center) => {
@@ -122,7 +118,6 @@ function citizenListByUrl(url, deleteAction, tableId) {
     headers: getHeaders(),
   })
     .then(function (response) {
-      
       redirectToLogin(response);
 
       if (response.ok) {
@@ -133,13 +128,12 @@ function citizenListByUrl(url, deleteAction, tableId) {
     })
     .then(function (citizens) {
       // Populate the table with citizen data
-      let message = '';
-      if(citizens.length > 0)
-      {
+      let message = "";
+      if (citizens.length > 0) {
         message = `<div class="alert alert-warning" role="alert">
         Total ${citizens.length} citizens found.
         </div>`;
-        let countRowElement = document.getElementById('countRow');
+        let countRowElement = document.getElementById("countRow");
         countRowElement.innerHTML = message;
       }
       var tableBody = document
@@ -451,13 +445,12 @@ function vaccinationCenters() {
     })
     .then(function (centers) {
       // Populate the table with citizen data
-      let message = '';
-      if(centers.length > 0)
-      {
+      let message = "";
+      if (centers.length > 0) {
         message = `<div class="alert alert-warning" role="alert">
         Total ${centers.length} vaccination center found.
         </div>`;
-        let countRowElement = document.getElementById('countRow');
+        let countRowElement = document.getElementById("countRow");
         countRowElement.innerHTML = message;
       }
       var tableBody = document
@@ -638,16 +631,16 @@ function saveCitizen(event) {
     })
     .then((data) => {
       console.log("Response:", data);
-      let messageElement = document.getElementById('errorList');
+      let messageElement = document.getElementById("errorList");
       messageElement.innerHTML = `
       <div class="alert alert-success" role="alert">
   Citizen Saved
 </div>
       `;
-      setTimeout(()=>{
-        let messageElement = document.getElementById('errorList');
-        messageElement.innerHTML='';
-      },2000);
+      setTimeout(() => {
+        let messageElement = document.getElementById("errorList");
+        messageElement.innerHTML = "";
+      }, 2000);
       // Handle the response as needed
     })
     .catch((error) => {
@@ -666,4 +659,74 @@ function _newCitizen(event) {
   display("citizenEdit", "block");
   display("citizenOnEdit", "none");
   _layoutCitizenOnNew();
+}
+
+// registration form
+
+function submitForm() {
+  const form = document.getElementById("registrationForm");
+  const name = form.elements["name"].value;
+  const email = form.elements["email"].value;
+  const password = form.elements["password"].value;
+
+  // Prepare the form data
+  const payload = {
+    name: name,
+    email: email,
+    password: password,
+  };
+
+  // Submit the form data using Fetch API
+  fetch("/registration", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        onActionMessage(
+          `<div class="alert alert-success" role="alert">Registration Success.</div>`
+        );
+        return response.json();
+      }
+      console.log(response);
+      if (response.status == 400) {
+        // Bad Request, handle errors
+        return response.json().then((data) => {
+          if (Array.isArray(data.errors)) {
+            let errorLabels = "";
+            data.errors.forEach((error) => {
+              errorLabels += `<div class="alert alert-warning" role="alert">${error.message}</div>`;
+            });
+            onActionMessage(errorLabels);
+          }
+          throw new Error("invalid data for registration: ");
+        });
+      } else {
+        onActionMessage(
+          `<div class="alert alert-warning" role="alert">Registration Failed. Try again!!</div>`
+        );
+      }
+    })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      // Handle any errors
+      console.error(error);
+      // alert('Registration Failed');
+    });
+}
+
+function onActionMessage(content) {
+  let errorMessage = content;
+  let messageListElement = document.getElementById("messageList");
+  messageListElement.innerHTML = errorMessage;
+
+  setTimeout(() => {
+    messageListElement.innerHTML = "";
+  }, 2000);
 }

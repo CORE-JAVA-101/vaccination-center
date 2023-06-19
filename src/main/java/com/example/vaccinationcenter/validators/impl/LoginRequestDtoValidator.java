@@ -18,7 +18,7 @@ public class LoginRequestDtoValidator implements ConstraintValidator<LoginReques
       flag = false;
       context.disableDefaultConstraintViolation();
       context.buildConstraintViolationWithTemplate("email required")
-          .addPropertyNode("email");
+          .addPropertyNode("email").addConstraintViolation();
     }
 
     if(!(value.getEmail().length() > 4 && value.getEmail().length() < 30))
@@ -26,7 +26,7 @@ public class LoginRequestDtoValidator implements ConstraintValidator<LoginReques
       flag = false;
       context.disableDefaultConstraintViolation();
       context.buildConstraintViolationWithTemplate("email length should be between 4 and 30")
-          .addPropertyNode("email");
+          .addPropertyNode("email").addConstraintViolation();
     }
 
     if(StringUtils.isBlank(value.getPassword()))
@@ -34,7 +34,7 @@ public class LoginRequestDtoValidator implements ConstraintValidator<LoginReques
       flag = false;
       context.disableDefaultConstraintViolation();
       context.buildConstraintViolationWithTemplate("password required")
-          .addPropertyNode("password");
+          .addPropertyNode("password").addConstraintViolation();
     }
 
 
@@ -43,7 +43,7 @@ public class LoginRequestDtoValidator implements ConstraintValidator<LoginReques
       flag = false;
       context.disableDefaultConstraintViolation();
       context.buildConstraintViolationWithTemplate("password length should be between 6 and 10")
-          .addPropertyNode("password");
+          .addPropertyNode("password").addConstraintViolation();
     }
 
     return flag;
