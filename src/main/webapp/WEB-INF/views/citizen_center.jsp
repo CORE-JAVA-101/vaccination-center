@@ -74,6 +74,7 @@
                     <tbody></tbody>
                 </table>
 
+                <div id="countRow"></div>
             </div>
     </div>
 

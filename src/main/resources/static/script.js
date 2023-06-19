@@ -133,26 +133,21 @@ function citizenListByUrl(url, deleteAction, tableId) {
     })
     .then(function (citizens) {
       // Populate the table with citizen data
+      let message = '';
+      if(citizens.length > 0)
+      {
+        message = `<div class="alert alert-warning" role="alert">
+        Total ${citizens.length} citizens found.
+        </div>`;
+        let countRowElement = document.getElementById('countRow');
+        countRowElement.innerHTML = message;
+      }
       var tableBody = document
         .getElementById(listTableId)
         .querySelector("tbody");
       citizens.forEach(function (citizen) {
         var row = document.createElement("tr");
         row.innerHTML = tableRow[listTableId](citizen);
-
-        let test = `
-                    <td>${citizen.id}</td>
-                    <td>${citizen.name}</td>
-                    <td>${citizen.city}</td>
-                    <td>${citizen.doesCount}</td>
-                    <td>${citizen.vaccinationStatus}</td>
-                    <td>${citizen.center?.name}</td>
-                    <td> 
-                    <button id="${citizen.id}" onclick="_citizenView(event)">View</button>
-                    <button id="${citizen.id}" onclick="_citizenEdit(event)">Edit</button>
-                    <button id="${citizen.id}" onclick="${deleteAction.name}(event)">Delete</button>
-                    </td>
-                `;
         tableBody.appendChild(row);
       });
     })
@@ -456,6 +451,15 @@ function vaccinationCenters() {
     })
     .then(function (centers) {
       // Populate the table with citizen data
+      let message = '';
+      if(centers.length > 0)
+      {
+        message = `<div class="alert alert-warning" role="alert">
+        Total ${centers.length} vaccination center found.
+        </div>`;
+        let countRowElement = document.getElementById('countRow');
+        countRowElement.innerHTML = message;
+      }
       var tableBody = document
         .getElementById("centerTable")
         .querySelector("tbody");
