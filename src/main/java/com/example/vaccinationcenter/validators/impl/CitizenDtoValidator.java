@@ -68,7 +68,7 @@ public class CitizenDtoValidator implements ConstraintValidator<CitizenValidator
             .addConstraintViolation();
       }
 
-      if (!(citizen.getCity().length() > 2 && citizen.getName().length() < 30)) {
+      if (!(citizen.getCity().length() > 2 && citizen.getCity().length() < 30)) {
         flag = false;
         context.disableDefaultConstraintViolation();
         context.

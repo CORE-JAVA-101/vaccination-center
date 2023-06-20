@@ -60,13 +60,13 @@ public class VaccinationCenterDtoValidator
       }
 
       Predicate<VaccinationCenterDto> validateNameLength = (VaccinationCenterDto center1) -> {
-        return center1.getName().length() > 4 && center1.getName().length() < 15;
+        return center1.getName().length() > 2 && center1.getName().length() < 30;
       };
 
       if (validateNameLength.negate().test(center)) {
         context.disableDefaultConstraintViolation();
         context.
-            buildConstraintViolationWithTemplate("Center Name Should be between 4 and 15 characters").addPropertyNode("name")
+            buildConstraintViolationWithTemplate("Center Name Should be between 2 and 30 characters").addPropertyNode("name")
             .addConstraintViolation();
         flag = false;
       }
@@ -79,12 +79,12 @@ public class VaccinationCenterDtoValidator
       }
 
       Predicate<VaccinationCenterDto> validateAddressLength = (VaccinationCenterDto center1) -> {
-        return center1.getCity().length() > 3 && center1.getCity().length() < 100;
+        return center1.getCity().length() > 2 && center1.getCity().length() < 100;
       };
 
       if (validateAddressLength.negate().test(center)) {
         context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate("Center City Should be between 15 and 100 characters").addPropertyNode("city")
+        context.buildConstraintViolationWithTemplate("Center City Should be between 2 and 100 characters").addPropertyNode("city")
             .addConstraintViolation();
         flag = false;
       }
